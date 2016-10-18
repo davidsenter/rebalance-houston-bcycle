@@ -4,6 +4,7 @@ public class Kiosk {
 	private String name;
 	private double latitude;
 	private double longitude;
+<<<<<<< HEAD
 	private int bikesAvailable;
 	private int docksAvailable;
 	private int capacity;
@@ -31,13 +32,25 @@ public class Kiosk {
 	}
 	public String getAddress(){
 		return address;
+=======
+	private String kioskID;
+	private String referenceName;
+
+	public Kiosk(double lat, double lon, String id, String refName) {
+		latitude = lat;
+		longitude = lon;
+		kioskID = id;
+		referenceName = refName;
+>>>>>>> origin/master
 	}
+	
 	public double getLat(){
 		return latitude;
 	}
 	public double getLon(){
 		return longitude;
 	}
+<<<<<<< HEAD
 	public int getN(){
 		return bikesAvailable;
 	}
@@ -59,4 +72,14 @@ public class Kiosk {
 	public void setNR(int NR){
 		this.NR = NR;
 	}
+=======
+	public String getReferenceName() {
+		return referenceName;
+	}
+	public String getkioskID() {
+		return kioskID;
+	}
+	
+	
+>>>>>>> origin/master
 }
