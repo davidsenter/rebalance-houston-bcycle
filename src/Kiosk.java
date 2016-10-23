@@ -1,6 +1,6 @@
 
 public class Kiosk {
-	private int stationID;
+	private String stationID;
 	private String name;
 	private double latitude;
 	private double longitude;
@@ -13,17 +13,15 @@ public class Kiosk {
 	private int periodDeltaNAvg;
 	private int NR;
 
-	public Kiosk(int stationID, String name, double latitude, double longitude, int bikesAvailable, int docksAvailable, String address) {
+	public Kiosk(String stationID, String name, String address, double latitude, double longitude) {
 		this.stationID = stationID;
 		this.name = name;
-		this.latitude = latitude;
-		this.longitude = longitude;
-		this.bikesAvailable = bikesAvailable;
-		this.docksAvailable = docksAvailable;
-		this.capacity = docksAvailable + bikesAvailable;
 		this.address = address;
+		this.longitude = longitude;
+		this.latitude = latitude;
+			
 	}
-	public int getID(){
+	public String getID(){
 		return stationID;
 	}
 	public String getName(){
@@ -47,6 +45,15 @@ public class Kiosk {
 	public int getCap(){
 		return capacity;
 	}
+	public void setName(String name){
+		this.name =  name;
+	}
+	public void setDocks(int docksAvailable){
+		this.docksAvailable = docksAvailable;
+	}
+	public void setBikes(int bikesAvailable){
+		this.bikesAvailable = bikesAvailable;
+	}
 	public void setPeriodTotalReturn(int periodTotalReturn){
 		this.periodTotalReturn = periodTotalReturn;
 	}
@@ -58,5 +65,9 @@ public class Kiosk {
 	}
 	public void setNR(int NR){
 		this.NR = NR;
+	}
+	
+	public String toString(){
+		return "Station ID: " + stationID + ";  Name: " + name + ";  Bikes Avail: " + bikesAvailable + ";  Docks Avail: "+ docksAvailable;
 	}
 }
