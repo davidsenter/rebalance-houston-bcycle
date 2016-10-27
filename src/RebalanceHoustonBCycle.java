@@ -20,10 +20,14 @@ public class RebalanceHoustonBCycle {
 		HashMap kioskRelativeDistances = setKioskRelativeDistances(kiosks);
 		
 		runTestMethods(tripsArray, kiosks, kioskRelativeDistances);
+		
+		for (int i = 0; i < kiosks.size(); i++) {
+			kiosks.get(i).
+		}
 	}
 	
 	public static ArrayList<Trip> loadTrips(){
-		String csvFile = "/Users/latanebullock/Desktop/Google Drive/Rice/Engi 120 B-cycle/git-hub/rebalance-houston-bcycle/lib/trip-data-20-oct.csv";
+		String csvFile = "/Users/davidsenter/GitHub/rebalance-houston-bcycle/lib/trip-data-20-oct.csv";
 		String line = "";
 		String csvSplitBy = ",";
 		ArrayList<String[]> tripStrings = new ArrayList<String[]>();
@@ -111,6 +115,19 @@ public class RebalanceHoustonBCycle {
 			e.printStackTrace();
 		}
 		return kiosks;
+	}
+	
+	public int periodDeltaN(ArrayList<Trip> tripsArray, Kiosk kiosk, int period){
+		int count = 0;
+		for (int i = 0; i < tripsArray.size(); i++) {
+			if (tripsArray.get(i).getStartingPeriod() == period) {
+				count++;
+			}
+			if (tripsArray.get(i).getEndingPeriod() == period) {
+				count--;
+			}
+		}
+		return count;
 	}
 	
 	public static Kiosk findKiosk(String tripToFind, ArrayList<Kiosk> kiosks){

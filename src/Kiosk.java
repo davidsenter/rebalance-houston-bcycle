@@ -8,8 +8,7 @@ public class Kiosk {
 	private int docksAvailable;
 	private int capacity;
 	private String address;
-	private int periodTotalReturn;
-	private int periodTotalCheckout;
+	private int periodDeltaN;
 	private int periodDeltaNAvg;
 	private int NR;
 
@@ -54,11 +53,8 @@ public class Kiosk {
 	public void setBikes(int bikesAvailable){
 		this.bikesAvailable = bikesAvailable;
 	}
-	public void setPeriodTotalReturn(int periodTotalReturn){
-		this.periodTotalReturn = periodTotalReturn;
-	}
-	public void setPeriodTotalCheckout(int periodTotalCheckout){
-		this.periodTotalCheckout = periodTotalCheckout;
+	public void setPeriodDeltaN(int periodTotalReturn){
+		this.periodDeltaN = periodTotalReturn;
 	}
 	public void setPeriodDeltaNAvg(int periodDeltaNAvg){
 		this.periodDeltaNAvg = periodDeltaNAvg;
