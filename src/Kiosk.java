@@ -8,9 +8,9 @@ public class Kiosk {
 	private int docksAvailable;
 	private int capacity;
 	private String address;
-	private int periodDeltaN;
-	private int periodDeltaNAvg;
-	private int NR;
+	private int[] periodDeltaN;
+	private double[] periodDeltaNAvg;
+	private int[] NR;
 
 	public Kiosk(String stationID, String name, String address, double latitude, double longitude) {
 		this.stationID = stationID;
@@ -18,6 +18,9 @@ public class Kiosk {
 		this.address = address;
 		this.longitude = longitude;
 		this.latitude = latitude;
+		this.periodDeltaN = new int[4];
+		this.periodDeltaNAvg = new double[4];
+		this.NR = new int[4]; 
 			
 	}
 	public String getID(){
@@ -41,8 +44,17 @@ public class Kiosk {
 	public int getDocks(){
 		return docksAvailable;
 	}
+	public int[] getPeriodDeltaN(){
+		return periodDeltaN;
+	}
+	public double[] getPeriodDeltaNAvg(){
+		return periodDeltaNAvg;
+	}
 	public int getCap(){
 		return capacity;
+	}
+	public void setCap(int cap){
+		this.capacity = cap;
 	}
 	public void setName(String name){
 		this.name =  name;
@@ -53,14 +65,18 @@ public class Kiosk {
 	public void setBikes(int bikesAvailable){
 		this.bikesAvailable = bikesAvailable;
 	}
-	public void setPeriodDeltaN(int periodTotalReturn){
-		this.periodDeltaN = periodTotalReturn;
+	public void setPeriodDeltaN(int[] periodDeltaN){
+		this.periodDeltaN = periodDeltaN;
 	}
-	public void setPeriodDeltaNAvg(int periodDeltaNAvg){
+	public void setPeriodDeltaNAvg(double[] periodDeltaNAvg){
 		this.periodDeltaNAvg = periodDeltaNAvg;
 	}
-	public void setNR(int NR){
+	public void setNR(int[] NR){
 		this.NR = NR;
+	}
+
+	public int[] getNR(){
+		return this.NR;
 	}
 	
 	public String toString(){

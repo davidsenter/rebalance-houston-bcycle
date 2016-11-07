@@ -11,7 +11,9 @@ public class RebalanceHoustonBCycle {
 	
 	public static void main(String[] args) {
 		
-		ArrayList<Trip> tripsArray = loadTrips();
+		ArrayList<Trip> trips = loadTrips();
+		
+		int days = 19;
 		
 		ArrayList<Kiosk> kiosks = loadKiosks();
 		
@@ -19,17 +21,74 @@ public class RebalanceHoustonBCycle {
 		
 		HashMap kioskRelativeDistances = setKioskRelativeDistances(kiosks);
 		
-		runTestMethods(tripsArray, kiosks, kioskRelativeDistances);
+		HashMap kioskTrips = new HashMap<Integer,ArrayList<Trip>>();
 		
-		for (int i = 0; i < kiosks.size(); i++) {
-			kiosks.get(i).
+		for (int i = 0; i < trips.size(); i++) {
+			for (int j = 0; j < kiosks.size(); j++) {
+				String kiosk = kiosks.get(j).getName();
+				String tripStartingKiosk = trips.get(i).getStartingKiosk();
+				String tripEndingKiosk = trips.get(i).getEndingKiosk();
+				int tripStartingPeriod = trips.get(i).getStartingPeriod();
+				int tripEndingPeriod = trips.get(i).getEndingPeriod();
+				int deltaN = 0;
+				
+				if (tripStartingKiosk.equals(kiosk)) {
+					int[] temp = kiosks.get(j).getPeriodDeltaN();
+					temp[tripStartingPeriod]--;
+					kiosks.get(j).setPeriodDeltaN(temp);
+				}
+				
+				if (tripEndingKiosk.equals(kiosk)) {
+					int[] temp = kiosks.get(j).getPeriodDeltaN();
+					temp[tripEndingPeriod]++;
+					kiosks.get(j).setPeriodDeltaN(temp);
+				}
+			}
 		}
+		
+		
+		for (int i = 0; i < kiosks.size(); i++){
+			int[] temp = kiosks.get(i).getPeriodDeltaN();
+			double[] temp2 = new double[4];
+			for (int j = 0; j < temp.length; j++){
+				temp2[j] = (double) temp[j] / (double) days;
+			}
+			kiosks.get(i).setPeriodDeltaNAvg(temp2);
+		}
+		
+		
+//		for (int j = 0; j < kiosks.size(); j++){
+//			System.out.println(j + kiosks.get(j).toString());
+//			for (int i = 0; i < 4; i++){
+//				System.out.println(kiosks.get(j).getPeriodDeltaNAvg()[i]);
+//			}
+//			System.out.println();
+//		}
+		
+		for (int i = 0; i < kiosks.size(); i++){
+			int[] temp = new int[4];
+			for (int j = 0; j < 4; j++){
+				temp[j] = (int)Math.round((kiosks.get(i).getCap() / 2) + 1 - kiosks.get(i).getN() - kiosks.get(i).getPeriodDeltaNAvg()[j]);
+			}
+			kiosks.get(i).setNR(temp);
+		}
+		
+		for (int j = 0; j < kiosks.size(); j++){
+			System.out.println(j + kiosks.get(j).toString());
+			for (int i = 0; i < 4; i++){
+				System.out.println(kiosks.get(j).getNR()[i]);
+			}
+			System.out.println();
+		}
+		
+		runTestMethods(trips, kiosks, kioskRelativeDistances);
+		
 	}
 	
 	public static ArrayList<Trip> loadTrips(){
 		String csvFile = "/Users/davidsenter/GitHub/rebalance-houston-bcycle/lib/trip-data-20-oct.csv";
 		String line = "";
-		String csvSplitBy = ",";
+		String csvSplitBy = ";";
 		ArrayList<String[]> tripStrings = new ArrayList<String[]>();
 		ArrayList<Trip> trips = new ArrayList<Trip>();
 		
@@ -45,11 +104,21 @@ public class RebalanceHoustonBCycle {
 		} catch (IOException e) {
             e.printStackTrace();
         }
-		
+		int days = 0;
 		for (int i = 0; i < tripStrings.size(); i++) {
+			if (i >= 1) {
+				String nextDate = tripStrings.get(i - 1)[5];
+				String tempDate = tripStrings.get(i)[5];
+				
+				if (!(nextDate.equals(tempDate))) {
+					days += 1;
+//					System.out.println(tempDate + " " +  days);
+				}
+			}
 			trips.add(new Trip(tripStrings.get(i)[6],tripStrings.get(i)[9],tripStrings.get(i)[7],
 					tripStrings.get(i)[10],tripStrings.get(i)[5],tripStrings.get(i)[8]));
 		}
+		System.out.println(days);
 		
 		return trips;
 	}
@@ -70,6 +139,7 @@ public class RebalanceHoustonBCycle {
 				JSONObject station = (JSONObject) stationArray.get(index);
 				String stationID = (String) station.get("station_id");
 				String name = (String) station.get("name");
+				name = name.trim();
 				String address = (String) station.get("address");
 				double longitude = (double) station.get("lon");
 				double latitude = (double) station.get("lat");
@@ -100,6 +170,7 @@ public class RebalanceHoustonBCycle {
 			for (int index = 0; index < stationArray.size(); index++) {
 				JSONObject jsonStation = (JSONObject) stationArray.get(index);
 				String stationID = (String) jsonStation.get("station_id");
+//				int stationID = Integer.valueOf(stationIDTemp.substring(16));
 				
 				long num_bikes_available_d = (long) jsonStation.get("num_bikes_available");
 				long num_docks_available_d = (long) jsonStation.get("num_docks_available");
@@ -109,6 +180,7 @@ public class RebalanceHoustonBCycle {
 				Kiosk tempKiosk = findKiosk(stationID, kiosks);
 				tempKiosk.setBikes(num_bikes_available);
 				tempKiosk.setDocks(num_docks_available);
+				tempKiosk.setCap(num_bikes_available + num_docks_available);
 			}
 			
 		} catch (ParseException e) {
@@ -117,7 +189,7 @@ public class RebalanceHoustonBCycle {
 		return kiosks;
 	}
 	
-	public int periodDeltaN(ArrayList<Trip> tripsArray, Kiosk kiosk, int period){
+	public int periodDeltaN(ArrayList<Trip> tripsArray, int period){
 		int count = 0;
 		for (int i = 0; i < tripsArray.size(); i++) {
 			if (tripsArray.get(i).getStartingPeriod() == period) {
@@ -186,8 +258,12 @@ public class RebalanceHoustonBCycle {
 		HashSet<Kiosk> testPair = new HashSet<Kiosk>();
 		Kiosk kiosk2271 = findKiosk("Lamar & Milam", kiosks);
 		Kiosk kiosk2272 = findKiosk("Spotts Park", kiosks);
+		System.out.println(kiosks.get(10).getPeriodDeltaN());
+		
 		testPair.add(kiosk2271);
 		testPair.add(kiosk2272);
 		System.out.println("Distance between station \"" + kiosk2271.getName() + "\" and \"" + kiosk2272.getName() + "\" :: " + kioskRelativeDistances.get(testPair));
+		
+		
 	}
 }
