@@ -23,8 +23,6 @@ public class RebalanceHoustonBCycle {
 		
 		kiosks = loadSystemStatus(kiosks);
 		
-		HashMap kioskRelativeDistances = setKioskRelativeDistances(kiosks);
-		
 		HashMap kioskTrips = new HashMap<Integer,ArrayList<Trip>>();
 		
 		// find deltaN for each kiosk for each station
@@ -95,13 +93,15 @@ public class RebalanceHoustonBCycle {
 		}
 		
 		// BEGIN PHASE 3:
-		
+		HashMap kioskRelativeDistances = setKioskRelativeDistances(kiosks);
 		
 		
 		runTestMethods(trips, kiosks, kioskRelativeDistances);
 		
 	}
 	
+	/* loads trips from the csv data file
+	 * @return ArrayList of all the trips and all of their info */
 	public static ArrayList<Trip> loadTrips(){
 		String csvFile = "/Users/davidsenter/GitHub/rebalance-houston-bcycle/lib/trip-data-20-oct.csv";
 		String line = "";
@@ -140,6 +140,8 @@ public class RebalanceHoustonBCycle {
 		return trips;
 	}
 	
+	/* loads kiosks from JSON file of system status information
+	 * @return ArrayList of all the kiosks and their information */
 	public static ArrayList<Kiosk> loadKiosks(){
 		ArrayList<Kiosk> kiosks = new ArrayList<Kiosk>();
 		JSONParser parser = new JSONParser();
@@ -171,6 +173,8 @@ public class RebalanceHoustonBCycle {
 		return kiosks;
 	}
 
+	/* loads the dynamic data and pushes it to the kiosks in the ArrayList
+	 * @return the updated ArrayList of kiosks with the new dynamic data*/
 	public static ArrayList<Kiosk> loadSystemStatus(ArrayList<Kiosk> kiosks){
 		String statusURL = "https://gbfs.bcycle.com/bcycle_houston/station_status.json";
 		String systemStatusString = readURL(statusURL);
@@ -206,29 +210,24 @@ public class RebalanceHoustonBCycle {
 		return kiosks;
 	}
 	
-	public int periodDeltaN(ArrayList<Trip> tripsArray, int period){
-		int count = 0;
-		for (int i = 0; i < tripsArray.size(); i++) {
-			if (tripsArray.get(i).getStartingPeriod() == period) {
-				count++;
-			}
-			if (tripsArray.get(i).getEndingPeriod() == period) {
-				count--;
-			}
-		}
-		return count;
-	}
-	
-	public static Kiosk findKiosk(String tripToFind, ArrayList<Kiosk> kiosks){
+	/* identifies a specific kiosk based on its name or ID
+	 * @return the kiosk object with all its info associated with it
+	 * @param string of kioskToFind and arraylist of kiosk
+	 */
+	public static Kiosk findKiosk(String kioskToFind, ArrayList<Kiosk> kiosks){
 		Kiosk kioskFound = null;
 		for (Kiosk tempKiosk : kiosks){
-			if (tripToFind.equals(tempKiosk.getName())  || tripToFind.equals(tempKiosk.getID())){
+			if (kioskToFind.equals(tempKiosk.getName())  || kioskToFind.equals(tempKiosk.getID())){
 				kioskFound = tempKiosk;
 			}
 		}
 		return kioskFound;
 	}
 	
+	/* goes to a url and reads data in as a string
+	 * @return a string of the data in the url
+	 * @param string of url
+	 */
 	public static String readURL(String urlString) {
 		String urlContents = "";
 		try{
@@ -248,6 +247,11 @@ public class RebalanceHoustonBCycle {
         
   }
         
+	// PHASE 3
+	/* relates distances between kiosks with associated kiosks
+	 * @return hashmap of kiosk distances with a kiosk pair  as keys and distance between kiosks as the value
+	 * @param array list of kiosks
+	 */
 	public static HashMap setKioskRelativeDistances (ArrayList<Kiosk> kiosks){
 		HashMap kioskDistances = new HashMap();
 		for (Kiosk kiosk1 : kiosks){
@@ -264,6 +268,10 @@ public class RebalanceHoustonBCycle {
 		return kioskDistances;
 	}
 
+	/* Prints out data to show results of code
+	 * print kiosk information
+	 * @param array list of kiosks, array list of trips, hashmap of relative distances
+	 */
 	public static void runTestMethods(ArrayList<Trip> tripsArray, ArrayList<Kiosk> kiosks, HashMap kioskRelativeDistances) {
 		// Print out specific trip and its attributes from the trips array
 		System.out.println(tripsArray.get(110).toString());
