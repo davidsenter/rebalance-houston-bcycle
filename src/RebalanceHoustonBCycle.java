@@ -13,10 +13,12 @@ public class RebalanceHoustonBCycle {
 		
 		// BEGIN PHASE 1
 		
+		// load trips
 		ArrayList<Trip> trips = loadTrips();
 		
 		int days = 19;
 		
+		// load kiosks
 		ArrayList<Kiosk> kiosks = loadKiosks();
 		
 		kiosks = loadSystemStatus(kiosks);
@@ -24,6 +26,8 @@ public class RebalanceHoustonBCycle {
 		HashMap kioskRelativeDistances = setKioskRelativeDistances(kiosks);
 		
 		HashMap kioskTrips = new HashMap<Integer,ArrayList<Trip>>();
+		
+		// find deltaN for each kiosk for each station
 		
 		for (int i = 0; i < trips.size(); i++) {
 			for (int j = 0; j < kiosks.size(); j++) {
@@ -48,6 +52,7 @@ public class RebalanceHoustonBCycle {
 			}
 		}
 		
+		// find average deltaN for each kiosk for each period
 		
 		for (int i = 0; i < kiosks.size(); i++){
 			int[] temp = kiosks.get(i).getPeriodDeltaN();
@@ -58,6 +63,7 @@ public class RebalanceHoustonBCycle {
 			kiosks.get(i).setPeriodDeltaNAvg(temp2);
 		}
 		
+		// print phase 1 test
 		
 //		for (int j = 0; j < kiosks.size(); j++){
 //			System.out.println(j + kiosks.get(j).toString());
@@ -69,6 +75,7 @@ public class RebalanceHoustonBCycle {
 		
 		// BEGIN PHASE 2:
 		
+		// calculate NR for each kiosk for each period
 		for (int i = 0; i < kiosks.size(); i++){
 			int[] temp = new int[4];
 			for (int j = 0; j < 4; j++){
@@ -76,6 +83,8 @@ public class RebalanceHoustonBCycle {
 			}
 			kiosks.get(i).setNR(temp);
 		}
+		
+		// print phase 2 test
 		
 		for (int j = 0; j < kiosks.size(); j++){
 			System.out.println(j + " " + kiosks.get(j).toString());
