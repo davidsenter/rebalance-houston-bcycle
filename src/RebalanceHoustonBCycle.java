@@ -11,6 +11,8 @@ public class RebalanceHoustonBCycle {
 	
 	public static void main(String[] args) {
 		
+		// BEGIN PHASE 1
+		
 		ArrayList<Trip> trips = loadTrips();
 		
 		int days = 19;
@@ -65,6 +67,8 @@ public class RebalanceHoustonBCycle {
 //			System.out.println();
 //		}
 		
+		// BEGIN PHASE 2:
+		
 		for (int i = 0; i < kiosks.size(); i++){
 			int[] temp = new int[4];
 			for (int j = 0; j < 4; j++){
@@ -74,12 +78,16 @@ public class RebalanceHoustonBCycle {
 		}
 		
 		for (int j = 0; j < kiosks.size(); j++){
-			System.out.println(j + kiosks.get(j).toString());
+			System.out.println(j + " " + kiosks.get(j).toString());
 			for (int i = 0; i < 4; i++){
 				System.out.println(kiosks.get(j).getNR()[i]);
 			}
 			System.out.println();
 		}
+		
+		// BEGIN PHASE 3:
+		
+		
 		
 		runTestMethods(trips, kiosks, kioskRelativeDistances);
 		
