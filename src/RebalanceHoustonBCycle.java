@@ -93,6 +93,7 @@ public class RebalanceHoustonBCycle {
 		}
 		
 		// BEGIN PHASE 3:
+<<<<<<< Updated upstream
 <<<<<<< HEAD
 		Date now = new Date();
 		int currentPeriod;
@@ -129,6 +130,8 @@ public class RebalanceHoustonBCycle {
 				double score = Math.abs(kiosks.get(i).getNR()
 =======
 <<<<<<< HEAD
+=======
+>>>>>>> Stashed changes
 		Date now = new Date(); 
 		int currentPeriod;
 		
@@ -148,9 +151,9 @@ public class RebalanceHoustonBCycle {
 			//System.out.println("Outside time period");
 		}
 		
-=======
+
 		HashMap kioskRelativeDistances = setKioskRelativeDistances(kiosks);
->>>>>>> origin/master
+
 		
 		for (int i = 0; i < kiosks.size(); i++){
 			for (int j = 0; j < kiosks.size(); j++){
@@ -356,6 +359,8 @@ public class RebalanceHoustonBCycle {
 		testPair.add(kiosk2271);
 		testPair.add(kiosk2272);
 		System.out.println("Distance between station \"" + kiosk2271.getName() + "\" and \"" + kiosk2272.getName() + "\" :: " + kioskRelativeDistances.get(testPair));
+		
+		double[] pairingScores;
 		
 		
 	}
