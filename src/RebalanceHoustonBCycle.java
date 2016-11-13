@@ -93,8 +93,41 @@ public class RebalanceHoustonBCycle {
 		}
 		
 		// BEGIN PHASE 3:
-		HashMap kioskRelativeDistances = setKioskRelativeDistances(kiosks);
+		Date now = new Date();
+		int currentPeriod;
 		
+		if (now.getHours() >= 6 && now.getHours() <= 9){
+			currentPeriod = 0;
+		}
+		else if (now.getHours() >= 6 && now.getHours() <= 9){
+			currentPeriod = 0;
+		}
+		else if (now.getHours() >= 6 && now.getHours() <= 9){
+			currentPeriod = 0;
+		}
+		else if (now.getHours() >= 6 && now.getHours() <= 9){
+			currentPeriod = 0;
+		}
+		else if (now.getHours() >= 6 && now.getHours() <= 9){
+		}
+		
+		HashMap<String,Double> kioskRelativeDistances = setKioskRelativeDistances(kiosks);
+		for (int i = 0; i < kiosks.size(); i++){
+			for (int j = 0; j < kiosks.size(); j++) {
+				// Find distance
+				String pair1 = kiosks.get(i).getName() + ":" + kiosks.get(j).getName();
+				String pair2 = kiosks.get(j).getName() + ":" + kiosks.get(i).getName();
+				double distance = -1.0;
+				if (kioskRelativeDistances.containsKey(pair1)) {
+					distance = kioskRelativeDistances.get(pair1);
+				}
+				else if (kioskRelativeDistances.containsKey(pair2)) {
+					distance = kioskRelativeDistances.get(pair2);
+				}
+				// Calculate pairing score
+				double score = Math.abs(kiosks.get(i).getNR()
+			}
+		}
 		
 		runTestMethods(trips, kiosks, kioskRelativeDistances);
 		
@@ -247,19 +280,16 @@ public class RebalanceHoustonBCycle {
         
   }
         
-	// PHASE 3
 	/* relates distances between kiosks with associated kiosks
 	 * @return hashmap of kiosk distances with a kiosk pair  as keys and distance between kiosks as the value
 	 * @param array list of kiosks
 	 */
-	public static HashMap setKioskRelativeDistances (ArrayList<Kiosk> kiosks){
-		HashMap kioskDistances = new HashMap();
+	public static HashMap<String,Double> setKioskRelativeDistances (ArrayList<Kiosk> kiosks){
+		HashMap<String,Double> kioskDistances = new HashMap<String,Double>();
 		for (Kiosk kiosk1 : kiosks){
 			for (Kiosk kiosk2 : kiosks){
-				HashSet<Kiosk> kioskPair = new HashSet<Kiosk> ();
-				kioskPair.add(kiosk1);
-				kioskPair.add(kiosk2);
-				if (kioskPair.size() == 2){
+				String kioskPair = kiosk1.getName() + ":" + kiosk2.getName();
+				if (!kiosk1.getName().equals(kiosk2.getName())){
 					double distance = Math.sqrt( Math.pow(kiosk1.getLat() - kiosk2.getLat() , 2) + Math.pow(kiosk1.getLon() - kiosk2.getLon() ,  2)) ;
 					kioskDistances.put(kioskPair, distance);
 				}
