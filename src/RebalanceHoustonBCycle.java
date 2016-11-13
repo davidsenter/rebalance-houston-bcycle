@@ -93,6 +93,7 @@ public class RebalanceHoustonBCycle {
 		}
 		
 		// BEGIN PHASE 3:
+<<<<<<< HEAD
 		Date now = new Date();
 		int currentPeriod;
 		
@@ -126,17 +127,54 @@ public class RebalanceHoustonBCycle {
 				}
 				// Calculate pairing score
 				double score = Math.abs(kiosks.get(i).getNR()
+=======
+<<<<<<< HEAD
+		Date now = new Date(); 
+		int currentPeriod;
+		
+		if (now.getHours() >= 6 && now.getHours() <= 9) {
+			currentPeriod = 0;
+		}
+		else if (now.getHours() >= 10 && now.getHours() <= 14) {
+			currentPeriod = 1;
+		}
+		else if (now.getHours() >= 15 && now.getHours() <= 18) {
+			currentPeriod = 2;
+		}
+		else if (now.getHours() >= 19 && now.getHours() <= 23) {
+			currentPeriod = 3;
+		}
+		else {
+			//System.out.println("Outside time period");
+		}
+		
+=======
+		HashMap kioskRelativeDistances = setKioskRelativeDistances(kiosks);
+>>>>>>> origin/master
+		
+		for (int i = 0; i < kiosks.size(); i++){
+			for (int j = 0; j < kiosks.size(); j++){
+				if (!kiosks.get(i).getName().equals(kiosks.get(j).getName())) {
+					HashSet<Kiosk> pair = new HashSet<Kiosk>();
+					pair.add(kiosks.get(i));
+					pair.add(kiosks.get(j));
+					System.out.println(kioskRelativeDistances.get(pair).toString());
+//					double tempDistance = kioskRelativeDistances.get(pair);
+				}
+>>>>>>> origin/master
 			}
 		}
 		
 		runTestMethods(trips, kiosks, kioskRelativeDistances);
+		
+		updateSystemStatusFile();
 		
 	}
 	
 	/* loads trips from the csv data file
 	 * @return ArrayList of all the trips and all of their info */
 	public static ArrayList<Trip> loadTrips(){
-		String csvFile = "/Users/davidsenter/GitHub/rebalance-houston-bcycle/lib/trip-data-20-oct.csv";
+		String csvFile = "/Users/latanebullock/Desktop/Google Drive/Rice/Engi 120 B-cycle/git-hub/rebalance-houston-bcycle/lib/trip-data-20-oct.csv";
 		String line = "";
 		String csvSplitBy = ";";
 		ArrayList<String[]> tripStrings = new ArrayList<String[]>();
@@ -321,4 +359,25 @@ public class RebalanceHoustonBCycle {
 		
 		
 	}
+
+	public static void updateSystemStatusFile(){
+	
+		try{
+			
+			FileWriter writer = new FileWriter("/Users/latanebullock/Desktop/Google Drive/Rice/Engi 120 B-cycle/git-hub/rebalance-houston-bcycle/lib/system-status-stream.txt", true);
+			BufferedWriter bufWriter = new BufferedWriter(writer);
+			PrintWriter out = new PrintWriter(bufWriter);
+			
+			String statusURL = "https://gbfs.bcycle.com/bcycle_houston/station_status.json";
+			String systemStatusString = readURL(statusURL);
+			
+			out.println(systemStatusString);
+			out.close();
+			
+		} catch (Exception e){
+			e.printStackTrace();
+		}
+	}
+
+
 }
