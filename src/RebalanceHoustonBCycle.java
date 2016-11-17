@@ -109,26 +109,93 @@ public class RebalanceHoustonBCycle {
 			currentPeriod = 3;
 		}
 		
-		HashMap<String,Double> kioskRelativeDistances = setKioskRelativeDistances(kiosks);
+		kiosks.sort((Comparator<Kiosk>) new KioskComparator());
 		
-		for (int i = 0; i < kiosks.size(); i++){
-			for (int j = 0; j < kiosks.size(); j++) {
-				// Find distance
-				String pair1 = kiosks.get(i).getName() + ":" + kiosks.get(j).getName();
-				String pair2 = kiosks.get(j).getName() + ":" + kiosks.get(i).getName();
-				double distance = -1.0;
-				if (kioskRelativeDistances.containsKey(pair1)) {
-					distance = kioskRelativeDistances.get(pair1);
-				}
-				else if (kioskRelativeDistances.containsKey(pair2)) {
-					distance = kioskRelativeDistances.get(pair2);
-				}
-				// Calculate pairing score
-				double score = Math.abs(kiosks.get(i).getNR()[currentPeriod]);
+		ArrayList<Kiosk> sortedPositiveKiosks = new ArrayList<Kiosk>();
+		ArrayList<Kiosk> sortedNegativeKiosks = new ArrayList<Kiosk>();
+		
+		for (int i = kiosks.size() - 1; i >= 0; i--) {
+			if (kiosks.get(i).getNR()[currentPeriod] > 0) {
+				sortedPositiveKiosks.add(kiosks.get(i));
+			}
+			else if (kiosks.get(i).getNR()[currentPeriod] < 0) {
+				sortedNegativeKiosks.add(kiosks.get(i));
 			}
 		}
-		System.out.println(currentPeriod);
+		Collections.reverse(sortedPositiveKiosks);
 		
+		for (int i = 0; i < sortedPositiveKiosks.size(); i++) {
+			System.out.println(sortedPositiveKiosks.get(i).getName() + ": " + sortedPositiveKiosks.get(i).getNR()[currentPeriod]);
+		}
+		for (int i = 0; i < sortedNegativeKiosks.size(); i++) {
+			System.out.println(sortedNegativeKiosks.get(i).getName() + ": " + sortedNegativeKiosks.get(i).getNR()[currentPeriod]);
+		}
+		
+		int smallerList = 0;
+		if (sortedPositiveKiosks.size() > sortedNegativeKiosks.size()){
+			smallerList = 0;
+		} else {
+			smallerList = 1;
+		}
+		
+		System.out.println();
+		
+		HashMap<String,Double> kioskRelativeDistances = setKioskRelativeDistances(kiosks);
+		ArrayList<Kiosk> results = new ArrayList<Kiosk>();
+		
+		if (smallerList == 0) {
+			
+			int i  = 0;
+			results = new ArrayList<Kiosk>();
+			while (sortedNegativeKiosks.size() > 0) {
+				ArrayList<Double> scores = new ArrayList<Double>();
+				for (int j = 0; j < sortedNegativeKiosks.size(); j++){
+					String pair1 = sortedPositiveKiosks.get(i).getName() + ":" + sortedNegativeKiosks.get(j).getName();
+					String pair2 = sortedNegativeKiosks.get(j).getName() + ":" + sortedPositiveKiosks.get(i).getName();
+					double distance = -1.0;
+					if (kioskRelativeDistances.containsKey(pair1)) {
+						distance = kioskRelativeDistances.get(pair1);
+					}
+					else if (kioskRelativeDistances.containsKey(pair2)) {
+						distance = kioskRelativeDistances.get(pair2);
+					}
+					// Calculate pairing score
+					double score = (Math.abs(sortedPositiveKiosks.get(i).getNR()[currentPeriod] - sortedNegativeKiosks.get(j).getNR()[currentPeriod]) - 1) / distance;
+					scores.add(score);
+				}
+				results.add(sortedNegativeKiosks.remove(scores.indexOf(Collections.max(scores))));
+				i++;
+			}
+		}
+		else {
+			
+			int i  = 0;
+			results = new ArrayList<Kiosk>();
+			while (sortedPositiveKiosks.size() > 0) {
+				ArrayList<Double> scores = new ArrayList<Double>();
+				for (int j = 0; j < sortedPositiveKiosks.size(); j++){
+					String pair1 = sortedNegativeKiosks.get(i).getName() + ":" + sortedPositiveKiosks.get(j).getName();
+					String pair2 = sortedPositiveKiosks.get(j).getName() + ":" + sortedNegativeKiosks.get(i).getName();
+					double distance = -1.0;
+					if (kioskRelativeDistances.containsKey(pair1)) {
+						distance = kioskRelativeDistances.get(pair1);
+					}
+					else if (kioskRelativeDistances.containsKey(pair2)) {
+						distance = kioskRelativeDistances.get(pair2);
+					}
+					// Calculate pairing score
+					double score = (Math.abs(sortedNegativeKiosks.get(i).getNR()[currentPeriod] - sortedPositiveKiosks.get(j).getNR()[currentPeriod]) - 1) / distance;
+					scores.add(score);
+				}
+				results.add(sortedPositiveKiosks.remove(scores.indexOf(Collections.max(scores))));
+				i++;
+			}
+		}
+		
+		for (int i = 0; i < results.size(); i++) {
+			System.out.println(Math.abs(Math.min(results.get(i).getNR()[currentPeriod], sortedPositiveKiosks.get(i).getNR()[currentPeriod])) + " " + results.get(i).getName() + " -> " + sortedPositiveKiosks.get(i).getName());
+		}
+		System.out.println();
 		runTestMethods(trips, kiosks, kioskRelativeDistances);
 		
 		updateSystemStatusFile();
