@@ -193,7 +193,8 @@ public class RebalanceHoustonBCycle {
 		}
 		
 		for (int i = 0; i < results.size(); i++) {
-			System.out.println(Math.abs(Math.min(results.get(i).getNR()[currentPeriod], sortedPositiveKiosks.get(i).getNR()[currentPeriod])) + " " + results.get(i).getName() + " -> " + sortedPositiveKiosks.get(i).getName());
+//			System.out.println(Math.abs(Math.max(results.get(i).getNR()[currentPeriod], sortedPositiveKiosks.get(i).getNR()[currentPeriod])) + " bikes from " + results.get(i).getName() + " ->  to " + sortedPositiveKiosks.get(i).getName());
+			System.out.println("Move " + (int)Math.floor((Math.abs(results.get(i).getNR()[currentPeriod]) + Math.abs(sortedPositiveKiosks.get(i).getNR()[currentPeriod])) / 2.0) + " bikes from " + results.get(i).getName() + " ->  to " + sortedPositiveKiosks.get(i).getName());
 		}
 		System.out.println();
 		runTestMethods(trips, kiosks, kioskRelativeDistances);
@@ -205,7 +206,7 @@ public class RebalanceHoustonBCycle {
 	/* loads trips from the csv data file
 	 * @return ArrayList of all the trips and all of their info */
 	public static ArrayList<Trip> loadTrips(){
-		String csvFile = "/Users/davidsenter/GitHub/rebalance-houston-bcycle/lib/trip-data-20-oct.csv";
+		String csvFile = "/Users/davidsenter/GitHub/rebalance-houston-bcycle/lib/trip-data-20-nov.csv";
 		String line = "";
 		String csvSplitBy = ";";
 		ArrayList<String[]> tripStrings = new ArrayList<String[]>();
