@@ -21,7 +21,7 @@ public class Trip {
 		this.startingKiosk = startingKiosk;
 		this.endingKiosk = endingKiosk;
 		
-	    parseFormat = new SimpleDateFormat("hh:mm a MM/dd/yyyy");
+	    parseFormat = new SimpleDateFormat("hh:mm a MM/dd/yy");
 	    String startingDateString = startingTime + " " + startingDate;
 	    String endingDateString = endingTime + " " + endingDate;
 	    
@@ -96,6 +96,21 @@ public class Trip {
 	}
 	public Date getEndingDateDate() {
 		return endingDate;
+	}
+	public boolean isWeekend() {
+		boolean result = false;
+		try {
+//			System.out.println(this.startingDate.getDay());
+			if (this.startingDate.getDay() == 0 || this.startingDate.getDay() == 6 ) {
+				result = true;
+			}
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return result;
+		
+		
 	}
 	
 }
