@@ -227,7 +227,7 @@ public class RebalanceHoustonBCycle {
 	 * @return ArrayList of all the trips and all of their info */
 	public static ArrayList<Trip> loadTrips(){
 
-		String csvFile = "/Users/latanebullock/Desktop/Google Drive/Rice/Engi 120 B-cycle/git-hub/rebalance-houston-bcycle/lib/trip-data-20-nov.csv";
+		String csvFile = "/Users/davidsenter/GitHub/rebalance-houston-bcycle/lib/trip-data-20-nov.csv";
 		String line = "";
 		String csvSplitBy = ",";
 		ArrayList<String[]> tripStrings = new ArrayList<String[]>();
@@ -250,26 +250,28 @@ public class RebalanceHoustonBCycle {
 		int days = 0;
 		Date now = new Date();
 		boolean isWeekend = false;
-//		try {
-//			if (now.getDay() == 0 || now.getDay() == 6 ) {
-//				isWeekend = true;
-//			}
-//		} catch (Exception e){
-//			e.printStackTrace();
-//		}
+		try {
+			if (now.getDay() == 0 || now.getDay() == 6 ) {
+				isWeekend = true;
+			}
+		} catch (Exception e){
+			e.printStackTrace();
+		}
 		
 		for (int i = 1; i < tripStrings.size(); i++) {
 			
 			Trip tempTrip = new Trip(tripStrings.get(i)[6],tripStrings.get(i)[9],tripStrings.get(i)[7],
 					tripStrings.get(i)[10],tripStrings.get(i)[5],tripStrings.get(i)[8]);
 			
-			if (tempTrip.isWeekend() && isWeekend) {
-				trips.add(tempTrip);
-				
-				
-			}
-			if (!tempTrip.isWeekend() && !isWeekend) {
-				trips.add(tempTrip);
+			String tempLastName = tripStrings.get(i)[2].toLowerCase();
+			
+			if (tempLastName.length() >= 4 && !tempLastName.substring(0,  3).equals("tech")) {
+				if (tempTrip.isWeekend() && isWeekend) {
+					trips.add(tempTrip);
+				}
+				if (!tempTrip.isWeekend() && !isWeekend) {
+					trips.add(tempTrip);
+				}
 			}
 		}
 		
