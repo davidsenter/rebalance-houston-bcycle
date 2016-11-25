@@ -186,6 +186,9 @@ public class RebalanceHoustonBCycle {
 				results.add(sortedNegativeKiosks.remove(scores.indexOf(Collections.max(scores))));
 				i++;
 			}
+			for (int j = 0; j < results.size(); j++) {
+				System.out.println("Move " + (int)Math.floor((Math.abs(results.get(j).getNR()[currentPeriod]) + Math.abs(sortedPositiveKiosks.get(j).getNR()[currentPeriod])) / 2.0) + " bikes from " + results.get(j).getName() + " ->  to " + sortedPositiveKiosks.get(j).getName());
+			}
 		}
 		else {
 			
@@ -210,12 +213,17 @@ public class RebalanceHoustonBCycle {
 				results.add(sortedPositiveKiosks.remove(scores.indexOf(Collections.max(scores))));
 				i++;
 			}
+			for (int j = 0; j < results.size(); j++) {
+				System.out.println("Move " + (int)Math.floor((Math.abs(results.get(j).getNR()[currentPeriod]) + Math.abs(sortedNegativeKiosks.get(j).getNR()[currentPeriod])) / 2.0) + " bikes from " + sortedNegativeKiosks.get(j).getName() + " ->  to " + results.get(j).getName());
+			}
 		}
-		
-		for (int i = 0; i < results.size(); i++) {
+//		System.out.println(results.size());
+//		for (int i = 0; i < results.size(); i++) {
 //			System.out.println(Math.abs(Math.max(results.get(i).getNR()[currentPeriod], sortedPositiveKiosks.get(i).getNR()[currentPeriod])) + " bikes from " + results.get(i).getName() + " ->  to " + sortedPositiveKiosks.get(i).getName());
-			System.out.println("Move " + (int)Math.floor((Math.abs(results.get(i).getNR()[currentPeriod]) + Math.abs(sortedPositiveKiosks.get(i).getNR()[currentPeriod])) / 2.0) + " bikes from " + results.get(i).getName() + " ->  to " + sortedPositiveKiosks.get(i).getName());
-		}
+//			System.out.println("Move " + (int)Math.floor((Math.abs(results.get(i).getNR()[currentPeriod]) + Math.abs(sortedPositiveKiosks.get(i).getNR()[currentPeriod])) / 2.0) + " bikes from " + results.get(i).getName() + " ->  to " + sortedPositiveKiosks.get(i).getName());
+//			System.out.println("Move " + (int)Math.floor((Math.abs(results.get(i).getNR()[currentPeriod]) + Math.abs(sortedNegativeKiosks.get(i).getNR()[currentPeriod])) / 2.0) + " bikes from " + sortedNegativeKiosks.get(i).getName() + " ->  to " + results.get(i).getName());
+
+//		}
 		System.out.println();
 		runTestMethods(trips, kiosks, kioskRelativeDistances);
 		
