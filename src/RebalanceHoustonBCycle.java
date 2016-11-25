@@ -221,6 +221,9 @@ public class RebalanceHoustonBCycle {
 		
 //		updateSystemStatusFile();
 		
+//		createSystemStatusCSV();
+	
+		
 	}
 	
 	/* loads trips from the csv data file
@@ -385,8 +388,26 @@ public class RebalanceHoustonBCycle {
 		}
 		return urlContents;
         
-  }
-        
+   }
+	 
+	public static String readFile(String fileName) throws IOException {
+	    BufferedReader br = new BufferedReader(new FileReader(fileName));
+	    try {
+	        StringBuilder sb = new StringBuilder();
+	        String line = br.readLine();
+
+	        while (line != null) {
+	            sb.append(line);
+	            sb.append("\n");
+	            line = br.readLine();
+	        }
+	        return sb.toString();
+	    } finally {
+	        br.close();
+	    }
+	}
+    
+	
 	/* relates distances between kiosks with associated kiosks
 	 * @return hashmap of kiosk distances with a kiosk pair  as keys and distance between kiosks as the value
 	 * @param array list of kiosks
@@ -449,5 +470,59 @@ public class RebalanceHoustonBCycle {
 		}
 	}
 
+	public static void createSystemStatusCSV(){
+		String fileName = "/Users/latanebullock/Desktop/Google Drive/Rice/Engi 120 B-cycle/git-hub/rebalance-houston-bcycle/lib/system-status-stream.txt";
+		try {
+			String jsonFileContents = readFile(fileName);
+			JSONParser parser = new JSONParser();
+			
+			FileWriter writer = new FileWriter("/Users/latanebullock/Desktop/Google Drive/Rice/Engi 120 B-cycle/git-hub/rebalance-houston-bcycle/lib/system-status-stream-final-csv.csv", true);
+			BufferedWriter bufWriter = new BufferedWriter(writer);
+			PrintWriter out = new PrintWriter(bufWriter);
+			
+			Object obj = parser.parse(jsonFileContents);
+			JSONObject jsonObject = (JSONObject) obj;
+			JSONArray systemUpdatesArray = (JSONArray) jsonObject.get("system_updates");
+			for (int index = 0; index < systemUpdatesArray.size(); index++) {
+				
+				JSONObject jsonSystemUpdate = (JSONObject) systemUpdatesArray.get(index);
+				long timeStampUnix = (long) jsonSystemUpdate.get("last_updated");
+				Date timeStampReadable = new Date((long) timeStampUnix *1000);
+				out.write(timeStampReadable.toString() + ",");
+				int hours = timeStampReadable.getHours();
+				int minutes = timeStampReadable.getMinutes();
+				if (minutes >= 30) {
+					hours ++;
+				}
+				
+				out.write(hours + ",");
+				String timeStampStr = Long.toString(timeStampUnix) + ",";
+				out.write(timeStampStr);
+				
+				JSONObject stations = (JSONObject) jsonSystemUpdate.get("data");
+				JSONArray stationArray = (JSONArray) stations.get("stations");
+
+				for (int j = 0; j < stationArray.size(); j++) {
+					
+					JSONObject jsonStation = (JSONObject) stationArray.get(j);
+					long num_bikes_available = (long) jsonStation.get("num_bikes_available");
+					String bikesAvail = Long.toString(num_bikes_available);
+					out.write(bikesAvail + ",");
+					
+				}
+				
+				out.println();
+			}
+			
+			out.close();
+			
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+		
+		
+	}
 
 }
