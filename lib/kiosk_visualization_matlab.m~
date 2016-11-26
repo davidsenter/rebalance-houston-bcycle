@@ -1,7 +1,0 @@
-filename = 'system-status-stream-final-csv.csv';
-M = csvread(filename);
-[m,n] = size(M);
-timestamp = M(:,1);
-kioskdata = M(:,2:n);
-plot(timestamp,kioskdata);
-disp(timestamp);

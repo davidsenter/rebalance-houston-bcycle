@@ -80,6 +80,6 @@ public class Kiosk {
 	}
 	
 	public String toString(){
-		return "Station ID: " + stationID + ";  Name: " + name + ";  Bikes Avail: " + bikesAvailable + ";  Docks Avail: "+ docksAvailable;
+		return "Station ID: " + stationID + ";  Name: " + name + ";  Bikes Avail: " + bikesAvailable + ";  Docks Avail: "+ docksAvailable + ";  ";
 	}
 }

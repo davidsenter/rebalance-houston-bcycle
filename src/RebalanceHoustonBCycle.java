@@ -16,54 +16,17 @@ public class RebalanceHoustonBCycle {
 		
 		// load trips
 		ArrayList<Trip> trips = loadTrips();
-		int dayCount = 0;
-		System.out.println(trips.get(7).getStartingDateDate().toString());
-		ArrayList<Integer> daysPresent = new ArrayList<Integer>();
-		for (int i = 0; i < trips.size(); i++ ){
-			
-			int tempDate = trips.get(i).getStartingDateDate().getDate();
-			if (!daysPresent.contains(tempDate)) {
-				daysPresent.add(tempDate);
-			}
-			
-		}
-		dayCount = daysPresent.size();
-		System.out.println("Days: " + dayCount);
-		for (int i = 0; i < daysPresent.size(); i++ ){
-			System.out.println(daysPresent.get(i));
-		}
+		
+		int dayCount = findNumDaysinTrips(trips);
 		
 		// load kiosks
 		ArrayList<Kiosk> kiosks = loadKiosks();
 		
 		kiosks = loadSystemStatus(kiosks);
 		
-		HashMap kioskTrips = new HashMap<Integer,ArrayList<Trip>>();
-		
 		// find deltaN for each kiosk for each station
 		
-		for (int i = 0; i < trips.size(); i++) {
-			for (int j = 0; j < kiosks.size(); j++) {
-				String kiosk = kiosks.get(j).getName();
-				String tripStartingKiosk = trips.get(i).getStartingKiosk();
-				String tripEndingKiosk = trips.get(i).getEndingKiosk();
-				int tripStartingPeriod = trips.get(i).getStartingPeriod();
-				int tripEndingPeriod = trips.get(i).getEndingPeriod();
-				int deltaN = 0;
-				
-				if (tripStartingKiosk.equals(kiosk)) {
-					int[] temp = kiosks.get(j).getPeriodDeltaN();
-					temp[tripStartingPeriod]--;
-					kiosks.get(j).setPeriodDeltaN(temp);
-				}
-				
-				if (tripEndingKiosk.equals(kiosk)) {
-					int[] temp = kiosks.get(j).getPeriodDeltaN();
-					temp[tripEndingPeriod]++;
-					kiosks.get(j).setPeriodDeltaN(temp);
-				}
-			}
-		}
+		kiosks = setDeltaNs(kiosks, trips);
 		
 		// find average deltaN for each kiosk for each period
 		
@@ -75,16 +38,6 @@ public class RebalanceHoustonBCycle {
 			}
 			kiosks.get(i).setPeriodDeltaNAvg(temp2);
 		}
-		
-		// print phase 1 test
-		
-//		for (int j = 0; j < kiosks.size(); j++){
-//			System.out.println(j + kiosks.get(j).toString());
-//			for (int i = 0; i < 4; i++){
-//				System.out.println(kiosks.get(j).getPeriodDeltaNAvg()[i]);
-//			}
-//			System.out.println();
-//		}
 		
 		// BEGIN PHASE 2:
 		
@@ -100,9 +53,9 @@ public class RebalanceHoustonBCycle {
 		// print phase 2 test
 		
 		for (int j = 0; j < kiosks.size(); j++){
-			System.out.println(j + " " + kiosks.get(j).toString());
+			System.out.println(j + " " + kiosks.get(j).toString() + "\n  Period DeltaN Avgs:");
 			for (int i = 0; i < 4; i++){
-				System.out.println(kiosks.get(j).getPeriodDeltaNAvg()[i]);
+				System.out.println("  P" + i + ": " + kiosks.get(j).getPeriodDeltaNAvg()[i]);
 			}
 			System.out.println();
 		}
@@ -141,6 +94,7 @@ public class RebalanceHoustonBCycle {
 				zeroCount ++;
 			}
 		}
+		
 		Collections.reverse(sortedPositiveKiosks);
 		
 		for (int i = 0; i < sortedPositiveKiosks.size(); i++) {
@@ -186,6 +140,9 @@ public class RebalanceHoustonBCycle {
 				results.add(sortedNegativeKiosks.remove(scores.indexOf(Collections.max(scores))));
 				i++;
 			}
+			for (int j = 0; j < results.size(); j++) {
+				System.out.println("Move " + (int)Math.floor((Math.abs(results.get(j).getNR()[currentPeriod]) + Math.abs(sortedPositiveKiosks.get(j).getNR()[currentPeriod])) / 2.0) + " bikes from " + results.get(j).getName() + " ->  to " + sortedPositiveKiosks.get(j).getName());
+			}
 		}
 		else {
 			
@@ -210,16 +167,21 @@ public class RebalanceHoustonBCycle {
 				results.add(sortedPositiveKiosks.remove(scores.indexOf(Collections.max(scores))));
 				i++;
 			}
+			for (int j = 0; j < results.size(); j++) {
+				System.out.println("Move " + (int)Math.floor((Math.abs(results.get(j).getNR()[currentPeriod]) + Math.abs(sortedNegativeKiosks.get(j).getNR()[currentPeriod])) / 2.0) + " bikes from " + sortedNegativeKiosks.get(j).getName() + " ->  to " + results.get(j).getName());
+			}
 		}
-		
-		for (int i = 0; i < results.size(); i++) {
+//		System.out.println(results.size());
+//		for (int i = 0; i < results.size(); i++) {
 //			System.out.println(Math.abs(Math.max(results.get(i).getNR()[currentPeriod], sortedPositiveKiosks.get(i).getNR()[currentPeriod])) + " bikes from " + results.get(i).getName() + " ->  to " + sortedPositiveKiosks.get(i).getName());
-			System.out.println("Move " + (int)Math.floor((Math.abs(results.get(i).getNR()[currentPeriod]) + Math.abs(sortedPositiveKiosks.get(i).getNR()[currentPeriod])) / 2.0) + " bikes from " + results.get(i).getName() + " ->  to " + sortedPositiveKiosks.get(i).getName());
-		}
+//			System.out.println("Move " + (int)Math.floor((Math.abs(results.get(i).getNR()[currentPeriod]) + Math.abs(sortedPositiveKiosks.get(i).getNR()[currentPeriod])) / 2.0) + " bikes from " + results.get(i).getName() + " ->  to " + sortedPositiveKiosks.get(i).getName());
+//			System.out.println("Move " + (int)Math.floor((Math.abs(results.get(i).getNR()[currentPeriod]) + Math.abs(sortedNegativeKiosks.get(i).getNR()[currentPeriod])) / 2.0) + " bikes from " + sortedNegativeKiosks.get(i).getName() + " ->  to " + results.get(i).getName());
+
+//		}
 		System.out.println();
 		runTestMethods(trips, kiosks, kioskRelativeDistances);
 		
-//		updateSystemStatusFile();
+		updateSystemStatusFiles();
 		
 //		createSystemStatusCSV();
 	
@@ -253,26 +215,28 @@ public class RebalanceHoustonBCycle {
 		int days = 0;
 		Date now = new Date();
 		boolean isWeekend = false;
-//		try {
-//			if (now.getDay() == 0 || now.getDay() == 6 ) {
-//				isWeekend = true;
-//			}
-//		} catch (Exception e){
-//			e.printStackTrace();
-//		}
+		try {
+			if (now.getDay() == 0 || now.getDay() == 6 ) {
+				isWeekend = true;
+			}
+		} catch (Exception e){
+			e.printStackTrace();
+		}
 		
 		for (int i = 1; i < tripStrings.size(); i++) {
 			
 			Trip tempTrip = new Trip(tripStrings.get(i)[6],tripStrings.get(i)[9],tripStrings.get(i)[7],
 					tripStrings.get(i)[10],tripStrings.get(i)[5],tripStrings.get(i)[8]);
 			
-			if (tempTrip.isWeekend() && isWeekend) {
-				trips.add(tempTrip);
-				
-				
-			}
-			if (!tempTrip.isWeekend() && !isWeekend) {
-				trips.add(tempTrip);
+			String tempLastName = tripStrings.get(i)[2].toLowerCase();
+			
+			if (tempLastName.length() >= 4 && !tempLastName.substring(0,  3).equals("tech")) {
+				if (tempTrip.isWeekend() && isWeekend) {
+					trips.add(tempTrip);
+				}
+				if (!tempTrip.isWeekend() && !isWeekend) {
+					trips.add(tempTrip);
+				}
 			}
 		}
 		
@@ -349,6 +313,46 @@ public class RebalanceHoustonBCycle {
 			
 		} catch (ParseException e) {
 			e.printStackTrace();
+		}
+		return kiosks;
+	}
+	
+	
+	public static int findNumDaysinTrips (ArrayList<Trip> trips) {
+		ArrayList<Integer> daysPresent = new ArrayList<Integer>();
+		for (int i = 0; i < trips.size(); i++ ){
+			
+			int tempDate = trips.get(i).getStartingDateDate().getDate();
+			if (!daysPresent.contains(tempDate)) {
+				daysPresent.add(tempDate);
+			}
+			
+		}
+		return daysPresent.size();
+	}
+	
+	public static ArrayList<Kiosk> setDeltaNs (ArrayList<Kiosk> kiosks, ArrayList<Trip> trips) {
+		for (int i = 0; i < trips.size(); i++) {
+			for (int j = 0; j < kiosks.size(); j++) {
+				String kiosk = kiosks.get(j).getName();
+				String tripStartingKiosk = trips.get(i).getStartingKiosk();
+				String tripEndingKiosk = trips.get(i).getEndingKiosk();
+				int tripStartingPeriod = trips.get(i).getStartingPeriod();
+				int tripEndingPeriod = trips.get(i).getEndingPeriod();
+				int deltaN = 0;
+				
+				if (tripStartingKiosk.equals(kiosk)) {
+					int[] temp = kiosks.get(j).getPeriodDeltaN();
+					temp[tripStartingPeriod]--;
+					kiosks.get(j).setPeriodDeltaN(temp);
+				}
+				
+				if (tripEndingKiosk.equals(kiosk)) {
+					int[] temp = kiosks.get(j).getPeriodDeltaN();
+					temp[tripEndingPeriod]++;
+					kiosks.get(j).setPeriodDeltaN(temp);
+				}
+			}
 		}
 		return kiosks;
 	}
@@ -451,54 +455,48 @@ public class RebalanceHoustonBCycle {
 		
 	}
 
-	public static void updateSystemStatusFile(){
-	
-		try{
-			
-			FileWriter writer = new FileWriter("/Users/davidsenter/GitHub/rebalance-houston-bcycle/lib/system-status-stream.txt", true);
-			BufferedWriter bufWriter = new BufferedWriter(writer);
-			PrintWriter out = new PrintWriter(bufWriter);
-			
-			String statusURL = "https://gbfs.bcycle.com/bcycle_houston/station_status.json";
-			String systemStatusString = readURL(statusURL);
-			
-			out.println(systemStatusString);
-			out.close();
-			
-		} catch (Exception e){
-			e.printStackTrace();
-		}
-	}
-
-	public static void createSystemStatusCSV(){
-		String fileName = "/Users/latanebullock/Desktop/Google Drive/Rice/Engi 120 B-cycle/git-hub/rebalance-houston-bcycle/lib/system-status-stream.txt";
-		try {
-			String jsonFileContents = readFile(fileName);
-			JSONParser parser = new JSONParser();
-			
-			FileWriter writer = new FileWriter("/Users/latanebullock/Desktop/Google Drive/Rice/Engi 120 B-cycle/git-hub/rebalance-houston-bcycle/lib/system-status-stream-final-csv.csv", true);
-			BufferedWriter bufWriter = new BufferedWriter(writer);
-			PrintWriter out = new PrintWriter(bufWriter);
-			
-			Object obj = parser.parse(jsonFileContents);
-			JSONObject jsonObject = (JSONObject) obj;
-			JSONArray systemUpdatesArray = (JSONArray) jsonObject.get("system_updates");
-			for (int index = 0; index < systemUpdatesArray.size(); index++) {
+	public static void updateSystemStatusFiles(){
+		String input = "";
+		Scanner in = new Scanner(System.in);
+		System.out.println("Are you sure you would like to update system status files? y or n");
+		input = in.nextLine();
+		if (input.equals("y")){
+			try{
 				
-				JSONObject jsonSystemUpdate = (JSONObject) systemUpdatesArray.get(index);
+				FileWriter writer = new FileWriter("/Users/latanebullock/Desktop/Google Drive/Rice/Engi 120 B-cycle/git-hub/rebalance-houston-bcycle/lib/system-status-stream-final-json.txt", true);
+				BufferedWriter bufWriter = new BufferedWriter(writer);
+				PrintWriter out = new PrintWriter(bufWriter);
+				
+				String statusURL = "https://gbfs.bcycle.com/bcycle_houston/station_status.json";
+				String systemStatusString = readURL(statusURL);
+				
+				out.println("," + systemStatusString + "\n\n");
+				out.close();
+				
+				
+				
+				JSONParser parser = new JSONParser();
+				
+				FileWriter csvWriter = new FileWriter("/Users/latanebullock/Desktop/Google Drive/Rice/Engi 120 B-cycle/git-hub/rebalance-houston-bcycle/lib/system-status-stream-final-csv.csv", true);
+				BufferedWriter csvBufWriter = new BufferedWriter(csvWriter);
+				PrintWriter csvOut = new PrintWriter(csvBufWriter);
+				
+				Object obj = parser.parse(systemStatusString);
+				JSONObject jsonSystemUpdate = (JSONObject) obj;
+					
 				long timeStampUnix = (long) jsonSystemUpdate.get("last_updated");
 				Date timeStampReadable = new Date((long) timeStampUnix *1000);
-				out.write(timeStampReadable.toString() + ",");
+				csvOut.write(timeStampReadable.toString() + ",");
 				int hours = timeStampReadable.getHours();
 				int minutes = timeStampReadable.getMinutes();
 				if (minutes >= 30) {
 					hours ++;
 				}
 				
-				out.write(hours + ",");
+				csvOut.write(hours + ",");
 				String timeStampStr = Long.toString(timeStampUnix) + ",";
-				out.write(timeStampStr);
-				
+				csvOut.write(timeStampStr);
+
 				JSONObject stations = (JSONObject) jsonSystemUpdate.get("data");
 				JSONArray stationArray = (JSONArray) stations.get("stations");
 
@@ -507,22 +505,81 @@ public class RebalanceHoustonBCycle {
 					JSONObject jsonStation = (JSONObject) stationArray.get(j);
 					long num_bikes_available = (long) jsonStation.get("num_bikes_available");
 					String bikesAvail = Long.toString(num_bikes_available);
-					out.write(bikesAvail + ",");
+					if(j == (stationArray.size() - 1)) {
+						csvOut.write(bikesAvail + "\n");
+					}
+					else{
+						csvOut.write(bikesAvail + ",");
+					}
 					
 				}
 				
-				out.println();
+			
+				csvOut.close();
+				
+			} catch (Exception e){
+				e.printStackTrace();
 			}
-			
-			out.close();
-			
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (ParseException e) {
-			e.printStackTrace();
 		}
-		
+		else{
+			System.out.println("System status files not updated...");
+		}
 		
 	}
 
+//	public static void createSystemStatusCSV(){
+//		String fileName = "/Users/latanebullock/Desktop/Google Drive/Rice/Engi 120 B-cycle/git-hub/rebalance-houston-bcycle/lib/system-status-stream.txt";
+//		try {
+//			String jsonFileContents = readFile(fileName);
+//			JSONParser parser = new JSONParser();
+//			
+//			FileWriter writer = new FileWriter("/Users/latanebullock/Desktop/Google Drive/Rice/Engi 120 B-cycle/git-hub/rebalance-houston-bcycle/lib/system-status-stream-final-csv.csv", true);
+//			BufferedWriter bufWriter = new BufferedWriter(writer);
+//			PrintWriter out = new PrintWriter(bufWriter);
+//			
+//			Object obj = parser.parse(jsonFileContents);
+//			JSONObject jsonObject = (JSONObject) obj;
+//			JSONArray systemUpdatesArray = (JSONArray) jsonObject.get("system_updates");
+//			for (int index = 0; index < systemUpdatesArray.size(); index++) {
+//				
+//				JSONObject jsonSystemUpdate = (JSONObject) systemUpdatesArray.get(index);
+//				long timeStampUnix = (long) jsonSystemUpdate.get("last_updated");
+//				Date timeStampReadable = new Date((long) timeStampUnix *1000);
+//				out.write(timeStampReadable.toString() + ",");
+//				int hours = timeStampReadable.getHours();
+//				int minutes = timeStampReadable.getMinutes();
+//				if (minutes >= 30) {
+//					hours ++;
+//				}
+//				
+//				out.write(hours + ",");
+//				String timeStampStr = Long.toString(timeStampUnix) + ",";
+//				out.write(timeStampStr);
+//				
+//				JSONObject stations = (JSONObject) jsonSystemUpdate.get("data");
+//				JSONArray stationArray = (JSONArray) stations.get("stations");
+//
+//				for (int j = 0; j < stationArray.size(); j++) {
+//					
+//					JSONObject jsonStation = (JSONObject) stationArray.get(j);
+//					long num_bikes_available = (long) jsonStation.get("num_bikes_available");
+//					String bikesAvail = Long.toString(num_bikes_available);
+//					out.write(bikesAvail + ",");
+//					
+//				}
+//				
+//				out.println();
+//			}
+//			
+//			out.close();
+//			
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		} catch (ParseException e) {
+//			e.printStackTrace();
+//		}
+//		
+//		
+//	}
+//
 }
